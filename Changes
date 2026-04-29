@@ -1,5 +1,9 @@
 Revision history for api-dashboard
 
+0.03 2026-04-29
+    - restored the missing `api-dashboard` ajax worker files under `dashboards/ajax/` so the extracted skill carries its request handlers with the page
+    - added Docker verification that the ajax files match the DD source page worker bodies exactly
+
 0.02 2026-04-29
     - added Docker-generated Playwright screenshots for the API dashboard README
     - used a temporary public API demo during screenshot generation without storing that API config in the repo

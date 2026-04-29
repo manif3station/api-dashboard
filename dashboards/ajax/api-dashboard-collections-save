@@ -1,0 +1,119 @@
+  BEGIN {
+    my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
+    if ( $ajax_file ne '' ) {
+      require File::Basename;
+      require File::Spec;
+      require lib;
+      my $root = File::Basename::dirname($ajax_file);
+      $root = File::Basename::dirname($root) for 1 .. 4;
+      my $candidate = File::Spec->catdir( $root, 'lib' );
+      lib->import($candidate) if -d $candidate;
+    }
+  }
+
+  use File::Basename qw(basename dirname);
+  use File::Path qw(make_path);
+  use File::Spec;
+  use Developer::Dashboard::Folder ();
+  use Developer::Dashboard::JSON qw(json_decode json_encode);
+  use Developer::Dashboard::PathRegistry ();
+
+  sub _api_dashboard_paths {
+    return Developer::Dashboard::PathRegistry->new;
+  }
+
+  sub _api_dashboard_collection_root {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'api-dashboard' );
+    make_path( $dir, { mode => 0700 } ) if $dir ne '' && !-d $dir;
+    _api_dashboard_paths()->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!" if $dir ne '' && -d $dir;
+    return $dir;
+  }
+
+  sub _api_dashboard_collection_name {
+    my ($collection) = @_;
+    die 'Collection info hash is required' if ref( $collection->{info} ) ne 'HASH';
+    my $name = defined $collection->{info}{name} ? $collection->{info}{name} : '';
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection info.name is required' if $name eq '';
+    return $name;
+  }
+
+  sub _api_dashboard_safe_filename {
+    my ($name) = @_;
+    $name = '' if !defined $name;
+    $name =~ s/[\x00-\x1F]+/ /g;
+    $name =~ s{[\\/:*?"<>|]+}{-}g;
+    $name =~ s/\s+/ /g;
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection name is required' if $name eq '' || $name eq '.' || $name eq '..';
+    return $name;
+  }
+
+  sub _api_dashboard_file_for_name {
+    my ($name) = @_;
+    return File::Spec->catfile( _api_dashboard_collection_root(), _api_dashboard_safe_filename($name) . '.json' );
+  }
+
+  sub _api_dashboard_coerce_collection {
+    my ($input) = @_;
+    die 'Collection payload must be a hash reference' if ref($input) ne 'HASH';
+    my $collection = ref( $input->{collection} ) eq 'HASH' ? $input->{collection} : $input;
+    die 'Collection payload must be a hash reference' if ref($collection) ne 'HASH';
+    my $name = _api_dashboard_collection_name($collection);
+    $collection->{info}{name} = $name;
+    $collection->{info}{schema} ||= 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json';
+    $collection->{item} = [] if ref( $collection->{item} ) ne 'ARRAY';
+    $collection->{variable} = [] if ref( $collection->{variable} ) ne 'ARRAY';
+    return $collection;
+  }
+
+  sub _api_dashboard_atomic_write_text {
+    my ( $file, $text ) = @_;
+    my $tmp = "$file.pending";
+    my $dir = dirname($file);
+    make_path( $dir, { mode => 0700 } ) if !-d $dir;
+    _api_dashboard_paths()->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!";
+    open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";
+    print {$fh} defined $text ? $text : '';
+    close $fh or die "Unable to close $tmp: $!";
+    _api_dashboard_paths()->secure_file_permissions($tmp);
+    chmod 0600, $tmp or die "Unable to chmod $tmp to 0600: $!";
+    unlink $file if -f $file;
+    rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    _api_dashboard_paths()->secure_file_permissions($file);
+    chmod 0600, $file or die "Unable to chmod $file to 0600: $!";
+    return $file;
+  }
+
+  my $collection_raw = params->{collection} // '';
+  die "collection payload is required" if $collection_raw eq '';
+  my $collection = json_decode($collection_raw);
+  die "collection payload must be a hash" if ref($collection) ne 'HASH';
+
+  my $stored = _api_dashboard_coerce_collection($collection);
+  my $name = _api_dashboard_collection_name($stored);
+  my $file = _api_dashboard_file_for_name($name);
+  my $original_name = scalar( params->{original_name} // '' );
+  my $original_file = $original_name ne '' ? _api_dashboard_file_for_name($original_name) : '';
+
+  die "Collection '$name' already exists"
+    if $original_name ne '' && -f $file && $original_file ne $file;
+
+  _api_dashboard_atomic_write_text( $file, json_encode($stored) );
+
+  if ( $original_file ne '' && $original_file ne $file && -f $original_file ) {
+    unlink $original_file or die "Unable to remove renamed collection file $original_file: $!";
+  }
+
+  print json_encode(
+    {
+      ok         => 1,
+      collection => $stored,
+      filename   => basename($file),
+      path       => $file,
+    }
+  );

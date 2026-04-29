@@ -1,0 +1,60 @@
+  BEGIN {
+    my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
+    if ( $ajax_file ne '' ) {
+      require File::Basename;
+      require File::Spec;
+      require lib;
+      my $root = File::Basename::dirname($ajax_file);
+      $root = File::Basename::dirname($root) for 1 .. 4;
+      my $candidate = File::Spec->catdir( $root, 'lib' );
+      lib->import($candidate) if -d $candidate;
+    }
+  }
+
+  use File::Basename qw(basename);
+  use File::Path qw(make_path);
+  use File::Spec;
+  use Developer::Dashboard::Folder ();
+  use Developer::Dashboard::JSON qw(json_encode);
+  use Developer::Dashboard::PathRegistry ();
+
+  sub _api_dashboard_collection_root {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'api-dashboard' );
+    make_path( $dir, { mode => 0700 } ) if $dir ne '' && !-d $dir;
+    Developer::Dashboard::PathRegistry->new->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!" if $dir ne '' && -d $dir;
+    return $dir;
+  }
+
+  sub _api_dashboard_safe_filename {
+    my ($name) = @_;
+    $name = '' if !defined $name;
+    $name =~ s/[\x00-\x1F]+/ /g;
+    $name =~ s{[\\/:*?"<>|]+}{-}g;
+    $name =~ s/\s+/ /g;
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection name is required' if $name eq '' || $name eq '.' || $name eq '..';
+    return $name;
+  }
+
+  sub _api_dashboard_file_for_name {
+    my ($name) = @_;
+    return File::Spec->catfile( _api_dashboard_collection_root(), _api_dashboard_safe_filename($name) . '.json' );
+  }
+
+  my $name = params->{name} // '';
+  die "collection name is required" if $name eq '';
+
+  my $file = _api_dashboard_file_for_name($name);
+  die "Collection '$name' does not exist" if !-f $file;
+
+  unlink $file or die "Unable to remove collection file $file: $!";
+
+  print json_encode(
+    {
+      ok       => 1,
+      filename => basename($file),
+      path     => $file,
+    }
+  );

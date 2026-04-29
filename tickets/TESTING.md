@@ -20,7 +20,7 @@ docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-tes
 - Functional test:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . && prove -lr t'`
   - Result: pass
-  - Test count: `Files=5, Tests=34`
+  - Test count: `Files=6, Tests=38`
 - Coverage test:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . && cover -delete && HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t && cover -report text -select_re "^lib/" -coverage statement -coverage subroutine'`
   - Result: pass
@@ -32,11 +32,13 @@ docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-tes
   - Assets: `docs/images/api-dashboard-collections.png`, `docs/images/api-dashboard-workspace.png`, `docs/images/api-dashboard-response.png`
 - Installed DD proof:
   - `dashboard skills install ~/projects/skills/skills/api-dashboard`
-  - Result: pass, installed `api-dashboard` at version `0.02`
+  - Result: pass, updated `api-dashboard` to version `0.03`
   - `dashboard restart`
   - Result: pass, DD web returned on `127.0.0.1:7890`
   - `curl -fsS http://127.0.0.1:7890/app/api-dashboard | rg -n "Collections|Workspace|Request Token Values|Response Headers|api-response-preview"`
   - Result: pass, returned the API dashboard page with the documented workspace controls
+  - `curl -fsS http://127.0.0.1:7890/ajax/api-dashboard-bootstrap?type=json`
+  - Result: pass, returned the bootstrap payload JSON from the restored ajax worker
 - Cleanup:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'rm -rf /workspace/skills/api-dashboard/cover_db'`
   - Result: pass

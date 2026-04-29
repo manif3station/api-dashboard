@@ -1,0 +1,111 @@
+  BEGIN {
+    my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
+    if ( $ajax_file ne '' ) {
+      require File::Basename;
+      require File::Spec;
+      require lib;
+      my $root = File::Basename::dirname($ajax_file);
+      $root = File::Basename::dirname($root) for 1 .. 4;
+      my $candidate = File::Spec->catdir( $root, 'lib' );
+      lib->import($candidate) if -d $candidate;
+    }
+  }
+
+  use File::Path qw(make_path);
+  use File::Spec;
+  use Developer::Dashboard::Folder ();
+  use Developer::Dashboard::JSON qw(json_decode json_encode);
+  use Developer::Dashboard::PathRegistry ();
+
+  sub _api_dashboard_collection_root {
+    my $dir = File::Spec->catdir( Developer::Dashboard::Folder->configs, 'api-dashboard' );
+    make_path( $dir, { mode => 0700 } ) if $dir ne '' && !-d $dir;
+    Developer::Dashboard::PathRegistry->new->secure_dir_permissions($dir);
+    chmod 0700, $dir or die "Unable to chmod $dir to 0700: $!" if $dir ne '' && -d $dir;
+    return $dir;
+  }
+
+  sub _api_dashboard_collection_name {
+    my ($collection) = @_;
+    die 'Collection info hash is required' if ref( $collection->{info} ) ne 'HASH';
+    my $name = defined $collection->{info}{name} ? $collection->{info}{name} : '';
+    $name =~ s/^\s+//;
+    $name =~ s/\s+\z//;
+    die 'Collection info.name is required' if $name eq '';
+    return $name;
+  }
+
+  sub _api_dashboard_coerce_collection {
+    my ($input) = @_;
+    die 'Collection payload must be a hash reference' if ref($input) ne 'HASH';
+    my $collection = ref( $input->{collection} ) eq 'HASH' ? $input->{collection} : $input;
+    die 'Collection payload must be a hash reference' if ref($collection) ne 'HASH';
+    my $name = _api_dashboard_collection_name($collection);
+    $collection->{info}{name} = $name;
+    $collection->{info}{schema} ||= 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json';
+    $collection->{item} = [] if ref( $collection->{item} ) ne 'ARRAY';
+    $collection->{variable} = [] if ref( $collection->{variable} ) ne 'ARRAY';
+    return $collection;
+  }
+
+  sub _api_dashboard_slurp {
+    my ($file) = @_;
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    local $/;
+    my $raw = <$fh>;
+    close $fh or die "Unable to close $file: $!";
+    return $raw;
+  }
+
+  my $dir = _api_dashboard_collection_root();
+  my @collections;
+  my @errors;
+
+  my $dh;
+  if ( !opendir( $dh, $dir ) ) {
+    print json_encode(
+      {
+        collections => [],
+        errors      => ["Unable to read api-dashboard collection directory $dir: $!"],
+      }
+    );
+    return;
+  }
+
+  for my $entry ( sort readdir $dh ) {
+    next if $entry eq '.' || $entry eq '..';
+    next if $entry !~ /\.json\z/i;
+
+    my $path = File::Spec->catfile( $dir, $entry );
+    next if !-f $path;
+    chmod 0600, $path or die "Unable to chmod $path to 0600: $!";
+
+    my $raw = eval { _api_dashboard_slurp($path) };
+    if ($@) {
+      push @errors, $@;
+      next;
+    }
+
+    my $parsed = eval { json_decode($raw) };
+    if ($@) {
+      push @errors, "Unable to parse Postman JSON in $entry";
+      next;
+    }
+
+    my $collection = eval { _api_dashboard_coerce_collection($parsed) };
+    if ($@) {
+      push @errors, "Skipping $entry because it does not contain a Postman collection";
+      next;
+    }
+
+    push @collections, $collection;
+  }
+
+  closedir $dh or push @errors, "Unable to close api-dashboard collection directory $dir: $!";
+
+  print json_encode(
+    {
+      collections => \@collections,
+      errors      => \@errors,
+    }
+  );
