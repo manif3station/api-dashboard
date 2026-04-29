@@ -36,7 +36,7 @@ http://127.0.0.1:7890/app/api-dashboard
 
 ## Runtime Notes
 
-The workspace uses DD-backed Ajax handlers to load saved collections, persist updates under the runtime config tree, and send HTTP requests through Perl.
+The workspace uses DD-backed Ajax handlers such as `/ajax/api-dashboard-bootstrap?type=json` to load saved collections, persist updates under the runtime config tree, and send HTTP requests through Perl.
 
 Examples:
 
@@ -58,5 +58,5 @@ dashboard cpan MIME::Base64
 ## Practical Edge Cases
 
 - if the DD runtime cannot load the HTTP client modules used by the request sender, the page still opens but request dispatch will not be usable until those modules are installed
-- if the shipped page ever changes, the exact-copy regression test will fail
+- if the shipped page or its ajax route contract changes, the route verification and worker-body regression tests will fail
 - if DD is stopped, the route will not answer until `dashboard restart` brings it back

@@ -36,6 +36,7 @@ This skill adds a browser page at:
 
 - an API request workspace page at `dashboards/index`
 - the matching ajax request handlers under `dashboards/ajax/`
+- DD-backed ajax routing through flat handler names such as `/ajax/api-dashboard-bootstrap?type=json`
 - Docker-only regression tests for copy integrity and browser layout smoke coverage
 - skill-local docs describing the workspace and how to install and use it
 
@@ -119,6 +120,10 @@ The page lets the user keep reusable request definitions in collections and open
 The page sends requests, shows response metadata, and renders response body, headers, and preview output
 ```
 
+```text
+The browser workspace resolves its DD-backed request handlers through the current DD flat ajax contract such as /ajax/api-dashboard-bootstrap?type=json
+```
+
 ## Edge Cases
 
 ```text
@@ -140,6 +145,7 @@ If a future update changes this skill page, the regression test will fail until 
 - `docs/changes/2026-04-29-extraction.md`
 - `docs/changes/2026-04-29-readme-screenshots.md`
 - `docs/changes/2026-04-29-ajax-workers-restored.md`
+- `docs/changes/2026-04-29-ajax-route-contract-proof.md`
 - `docs/images/api-dashboard-collections.png`
 - `docs/images/api-dashboard-workspace.png`
 - `docs/images/api-dashboard-response.png`
