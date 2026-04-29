@@ -20,14 +20,19 @@ docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-tes
 - Functional test:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . && prove -lr t'`
   - Result: pass
-  - Test count: `Files=4, Tests=22`
+  - Test count: `Files=5, Tests=34`
 - Coverage test:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . && cover -delete && HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t && cover -report text -select_re "^lib/" -coverage statement -coverage subroutine'`
   - Result: pass
   - Coverage: `100.0%` statement and `100.0%` subroutine for `lib/ApiDashboard/Asset.pm`
+- Screenshot generation:
+  - Result: pass
+  - Method: temporary Docker-time Playwright capture against a temporary public API demo
+  - Repo policy: the temporary example configuration used to capture the screenshots is not stored in the repo
+  - Assets: `docs/images/api-dashboard-collections.png`, `docs/images/api-dashboard-workspace.png`, `docs/images/api-dashboard-response.png`
 - Installed DD proof:
   - `dashboard skills install ~/projects/skills/skills/api-dashboard`
-  - Result: pass, installed `api-dashboard` at version `0.01`
+  - Result: pass, installed `api-dashboard` at version `0.02`
   - `dashboard restart`
   - Result: pass, DD web returned on `127.0.0.1:7890`
   - `curl -fsS http://127.0.0.1:7890/app/api-dashboard | rg -n "Collections|Workspace|Request Token Values|Response Headers|api-response-preview"`

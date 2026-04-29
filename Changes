@@ -1,5 +1,10 @@
 Revision history for api-dashboard
 
+0.02 2026-04-29
+    - added Docker-generated Playwright screenshots for the API dashboard README
+    - used a temporary public API demo during screenshot generation without storing that API config in the repo
+    - added verification for README screenshot assets
+
 0.01 2026-04-29
     - created the api-dashboard skill by extracting the current DD API dashboard page into a skill-local dashboard asset
     - added Docker tests for exact-copy integrity, bookmark structure, and browser layout smoke coverage

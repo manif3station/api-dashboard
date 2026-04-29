@@ -76,6 +76,20 @@ The page provides:
 - Postman collection import and export
 - browser-side response preview for supported media types
 
+## Screenshots
+
+Collections below shows a populated API request tree with a temporary public market-data example so the README reflects a working workspace instead of an empty shell.
+
+![API Dashboard Collections](docs/images/api-dashboard-collections.png)
+
+Workspace below shows the request editor with collection variables, token values, headers, and URL fields filled in from that demo flow.
+
+![API Dashboard Workspace](docs/images/api-dashboard-workspace.png)
+
+Response below shows the same request after dispatch, including response metadata and the formatted JSON body returned to the workspace.
+
+![API Dashboard Response](docs/images/api-dashboard-response.png)
+
 ## Runtime Dependency Notes
 
 This skill is a browser workspace. Sending requests depends on the DD runtime being able to load the Perl HTTP client modules used by the request sender.
@@ -123,3 +137,7 @@ If a future update changes this skill page, the regression test will fail until 
 - `docs/overview.md`
 - `docs/usage.md`
 - `docs/changes/2026-04-29-extraction.md`
+- `docs/changes/2026-04-29-readme-screenshots.md`
+- `docs/images/api-dashboard-collections.png`
+- `docs/images/api-dashboard-workspace.png`
+- `docs/images/api-dashboard-response.png`
