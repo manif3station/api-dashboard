@@ -32,15 +32,13 @@ docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-tes
   - Assets: `docs/images/api-dashboard-collections.png`, `docs/images/api-dashboard-workspace.png`, `docs/images/api-dashboard-response.png`
 - Installed DD proof:
   - `dashboard skills install ~/projects/skills/skills/api-dashboard`
-  - Result: pass, updated `api-dashboard` to version `0.05`
+  - Result: pass, updated `api-dashboard` to version `0.06`
   - `dashboard restart --port 7890`
   - Result: pass, DD web returned on `127.0.0.1:7890`
   - `curl -fsS http://127.0.0.1:7890/app/api-dashboard | rg -n "Collections|Workspace|Request Token Values|Response Headers|api-response-preview"`
   - Result: pass, returned the API dashboard page with the documented workspace controls
-  - `curl -fsS http://127.0.0.1:7890/ajax/api-dashboard-bootstrap?type=json`
-  - Result: pass, returned the bootstrap payload JSON from the current DD flat ajax route
-  - `curl -i -s http://127.0.0.1:7890/ajax/api-dashboard/bootstrap?type=json | sed -n '1,12p'`
-  - Result: pass, proved the skill-prefixed path is still `404 Not Found` in the shipped DD 3.24 runtime
+  - `curl -fsS http://127.0.0.1:7890/ajax/api-dashboard/bootstrap?type=json`
+  - Result: pass, returned the bootstrap payload JSON from the skill-prefixed ajax route
 - Cleanup:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'rm -rf /workspace/skills/api-dashboard/cover_db'`
   - Result: pass

@@ -31,10 +31,10 @@ sub normalize_body {
 
 my $content = slurp($source);
 my @files = qw(
-  api-dashboard-bootstrap
-  api-dashboard-collections-save
-  api-dashboard-collections-delete
-  api-dashboard-send-request
+  bootstrap
+  collections-save
+  collections-delete
+  send-request
 );
 
 for my $file (@files) {

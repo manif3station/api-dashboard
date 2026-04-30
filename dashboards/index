@@ -2465,7 +2465,7 @@ var configs = {};
 }());
 </script>
 :--------------------------------------------------------------------------------:
-CODE1: Ajax jvar => 'configs.collections.bootstrap', type => 'json', file => 'api-dashboard-bootstrap', code => q{
+CODE1: Ajax jvar => 'configs.collections.bootstrap', type => 'json', file => 'bootstrap', code => q{
   BEGIN {
     my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
     if ( $ajax_file ne '' ) {
@@ -2579,7 +2579,7 @@ CODE1: Ajax jvar => 'configs.collections.bootstrap', type => 'json', file => 'ap
   );
 };
 :--------------------------------------------------------------------------------:
-CODE2: Ajax jvar => 'configs.collections.save', type => 'json', file => 'api-dashboard-collections-save', code => q{
+CODE2: Ajax jvar => 'configs.collections.save', type => 'json', file => 'collections-save', code => q{
   BEGIN {
     my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
     if ( $ajax_file ne '' ) {
@@ -2701,7 +2701,7 @@ CODE2: Ajax jvar => 'configs.collections.save', type => 'json', file => 'api-das
   );
 };
 :--------------------------------------------------------------------------------:
-CODE3: Ajax jvar => 'configs.collections.delete', type => 'json', file => 'api-dashboard-collections-delete', code => q{
+CODE3: Ajax jvar => 'configs.collections.delete', type => 'json', file => 'collections-delete', code => q{
   BEGIN {
     my $ajax_file = $ENV{DEVELOPER_DASHBOARD_AJAX_FILE} || '';
     if ( $ajax_file ne '' ) {
@@ -2764,7 +2764,7 @@ CODE3: Ajax jvar => 'configs.collections.delete', type => 'json', file => 'api-d
   );
 };
 :--------------------------------------------------------------------------------:
-CODE4: Ajax jvar => 'configs.send.request', type => 'json', file => 'api-dashboard-send-request', code => q{
+CODE4: Ajax jvar => 'configs.send.request', type => 'json', file => 'send-request', code => q{
   use HTTP::Request;
   use LWP::Protocol::https ();
   use LWP::UserAgent;

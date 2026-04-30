@@ -36,7 +36,7 @@ This skill adds a browser page at:
 
 - an API request workspace page at `dashboards/index`
 - the matching ajax request handlers under `dashboards/ajax/`
-- DD-backed ajax routing through flat handler names such as `/ajax/api-dashboard-bootstrap?type=json`
+- DD skill-prefixed ajax routing through `/ajax/api-dashboard/...`
 - Docker-only regression tests for copy integrity and browser layout smoke coverage
 - skill-local docs describing the workspace and how to install and use it
 
@@ -121,7 +121,11 @@ The page sends requests, shows response metadata, and renders response body, hea
 ```
 
 ```text
-The browser workspace resolves its DD-backed request handlers through the current DD flat ajax contract such as /ajax/api-dashboard-bootstrap?type=json
+The browser workspace resolves its DD-backed request handlers through /ajax/api-dashboard/... so the page and saved workers stay namespaced to this skill
+```
+
+```text
+DD uses the same skill-prefixed route family for app and static assets, so browser-facing skill assets follow /app/<skill>/..., /ajax/<skill>/..., and when present /js/<skill>/..., /css/<skill>/..., and /others/<skill>/...
 ```
 
 ## Edge Cases
@@ -145,7 +149,7 @@ If a future update changes this skill page, the regression test will fail until 
 - `docs/changes/2026-04-29-extraction.md`
 - `docs/changes/2026-04-29-readme-screenshots.md`
 - `docs/changes/2026-04-29-ajax-workers-restored.md`
-- `docs/changes/2026-04-29-ajax-route-contract-proof.md`
+- `docs/changes/2026-04-30-skill-prefixed-ajax-routes.md`
 - `docs/images/api-dashboard-collections.png`
 - `docs/images/api-dashboard-workspace.png`
 - `docs/images/api-dashboard-response.png`

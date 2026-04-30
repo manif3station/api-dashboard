@@ -13,6 +13,6 @@ The page includes:
 - request credential presets
 - response detail, body, and header panes
 - saved Ajax worker definitions for collection bootstrap, collection save, collection delete, and request send
-- DD-backed ajax routing through flat handler names such as `/ajax/api-dashboard-bootstrap?type=json`
+- DD skill-prefixed ajax routing under `/ajax/api-dashboard/...`
 
 In practical terms, the skill helps the user keep API requests, tokens, auth settings, variables, and responses together in one place instead of scattering them across shell history and external tools.

@@ -23,10 +23,10 @@ is( scalar @{ $page->{ajax_blocks} }, 4, 'bookmark keeps all four saved Ajax wor
 is_deeply(
     [ map { $_->{file} } @{ $page->{ajax_blocks} } ],
     [
-        'api-dashboard-bootstrap',
-        'api-dashboard-collections-save',
-        'api-dashboard-collections-delete',
-        'api-dashboard-send-request',
+        'bootstrap',
+        'collections-save',
+        'collections-delete',
+        'send-request',
     ],
     'bookmark keeps the expected saved Ajax worker file names',
 );

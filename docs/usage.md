@@ -36,7 +36,15 @@ http://127.0.0.1:7890/app/api-dashboard
 
 ## Runtime Notes
 
-The workspace uses DD-backed Ajax handlers such as `/ajax/api-dashboard-bootstrap?type=json` to load saved collections, persist updates under the runtime config tree, and send HTTP requests through Perl.
+The workspace uses DD-backed Ajax handlers under `/ajax/api-dashboard/...` to load saved collections, persist updates under the runtime config tree, and send HTTP requests through Perl.
+
+DD uses the same skill-prefixed route family for browser-facing skill assets in general:
+
+- `/app/<skill>/...`
+- `/ajax/<skill>/...`
+- `/js/<skill>/...`
+- `/css/<skill>/...`
+- `/others/<skill>/...`
 
 Examples:
 

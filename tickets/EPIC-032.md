@@ -2,8 +2,8 @@
 
 ## Title
 
-Recheck the `api-dashboard` ajax route contract.
+Move `api-dashboard` to skill-prefixed ajax routes.
 
 ## Goal
 
-Recheck the `api-dashboard` ajax route contract against the current DD runtime and keep the extracted skill aligned with the route shape DD 3.24 actually serves.
+Rename the `api-dashboard` saved ajax workers to skill-local names and update the copied page bindings to call `/ajax/api-dashboard/...`.
