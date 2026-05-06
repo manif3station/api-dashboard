@@ -106,6 +106,12 @@ dashboard cpan HTTP::Message
 dashboard cpan MIME::Base64
 ```
 
+## License
+
+`api-dashboard` is released under the MIT License.
+
+See [LICENSE](LICENSE).
+
 ## Normal Cases
 
 ```text

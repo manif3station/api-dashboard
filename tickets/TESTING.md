@@ -16,6 +16,20 @@ docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-tes
 
 ## Latest Verification
 
+- Date: 2026-05-06
+- `DD-060` MIT license release gate:
+  - Functional test:
+    - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . >/tmp/api-dashboard-cpanm.log 2>&1 && prove -lr t'`
+    - Result: pass
+    - Test count: `Files=7, Tests=50`
+  - Coverage test:
+    - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . >/tmp/api-dashboard-cpanm.log 2>&1 && prove -lr t >/tmp/api-dashboard-prove.log 2>&1; prove_rc=$?; tail -n 40 /tmp/api-dashboard-prove.log; if [ \"$prove_rc\" -ne 0 ]; then exit \"$prove_rc\"; fi; cover -delete >/dev/null 2>&1 || true; HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t >/tmp/api-dashboard-cover-prove.log 2>&1; cover_rc=$?; tail -n 40 /tmp/api-dashboard-cover-prove.log; if [ \"$cover_rc\" -ne 0 ]; then exit \"$cover_rc\"; fi; cover -report text -select_re \"^lib/\" -coverage statement -coverage subroutine >/tmp/api-dashboard-cover.txt 2>&1; report_rc=$?; echo \"=== COVER ===\"; cat /tmp/api-dashboard-cover.txt; exit \"$report_rc\"'`
+    - Result: pass
+    - Coverage: `100.0%` statement and `100.0%` subroutine for `lib/ApiDashboard/Asset.pm`
+  - Cleanup:
+    - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'rm -rf /workspace/skills/api-dashboard/cover_db'`
+    - Result: pass
+
 - Date: 2026-04-29
 - Functional test:
   - `docker compose -f ~/projects/skills/docker-compose.testing.yml run --rm perl-test bash -lc 'cd /workspace/skills/api-dashboard && cpanm --quiet --notest --installdeps . && prove -lr t'`
