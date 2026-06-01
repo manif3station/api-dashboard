@@ -42,16 +42,10 @@ This skill adds a browser page at:
 
 ## Installation
 
-Install the skill from its repo:
+Install the skill into Developer Dashboard by repo name:
 
 ```bash
-dashboard skills install git@github.mf:manif3station/api-dashboard.git
-```
-
-For local development in this workspace:
-
-```bash
-dashboard skills install ~/projects/skills/skills/api-dashboard
+dashboard skills install api-dashboard
 ```
 
 ## How To Use It
